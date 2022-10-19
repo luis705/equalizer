@@ -1,87 +1,40 @@
-from scipy.io import wavfile
+from kivy.config import Config
+from kivy.lang import Builder
+from kivymd.app import MDApp
 
-from eq import create_filter, process_signal
+Config.set('graphics', 'width', '1280')
+Config.set('graphics', 'height', '720')
+Config.set('graphics', 'resizable', 0)
+Config.write()
 
-Fs = 96000
-order = 2**10 + 1
+colors = {
+    'Teal': {
+        '200': '#212121',
+        '500': '#212121',
+        '700': '#212121',
+    },
+    'Red': {
+        '200': '#C25554',
+        '500': '#C25554',
+        '700': '#C25554',
+    },
+    'Light': {
+        'StatusBar': 'E0E0E0',
+        'AppBar': '#202020',
+        'Background': '#AAAAAA',
+        'CardsDialogs': '#FFFFFF',
+        'FlatButtonDown': '#CCCCCC',
+    },
+}
 
-freqs = [
-    0,
-    16,
-    20,
-    25,
-    31,
-    40,
-    50,
-    63,
-    80,
-    100,
-    125,
-    160,
-    200,
-    250,
-    315,
-    400,
-    500,
-    630,
-    800,
-    1000,
-    1250,
-    1600,
-    2000,
-    2500,
-    3150,
-    4000,
-    5000,
-    6300,
-    8000,
-    10000,
-    12500,
-    16000,
-    20000,
-    25000,
-    Fs / 2,
-]
+# creating Demo Class(base class)
+class Equapyzer(MDApp):
+    def build(self):
+        self.theme_cls.colors = colors
+        self.theme_cls.primary_palette = 'Teal'
+        self.theme_cls.accent_palette = 'Red'
+        return Builder.load_file('gui.kv')
 
-gains = [
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    -100,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-]
 
-b = create_filter(freqs, gains, Fs, order)
-Fs, sinal = wavfile.read('signal.wav')
-output = process_signal(sinal, b, 512)
-wavfile.write('output.wav', Fs, output)
+if __name__ == '__main__':
+    Equapyzer().run()
