@@ -16,6 +16,8 @@ MDBoxLayout:
                 halign: "center"
                 valign: "top"
             MDSlider:
+                id: 16Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -26,6 +28,8 @@ MDBoxLayout:
                 text: "20Hz"
                 halign: "center"
             MDSlider:
+                id: 20Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -36,6 +40,8 @@ MDBoxLayout:
                 text: "25Hz"
                 halign: "center"
             MDSlider:
+                id: 25Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -46,6 +52,8 @@ MDBoxLayout:
                 text: "31Hz"
                 halign: "center"
             MDSlider:
+                id: 31Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -56,6 +64,8 @@ MDBoxLayout:
                 text: "40Hz"
                 halign: "center"
             MDSlider:
+                id: 40Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -66,6 +76,8 @@ MDBoxLayout:
                 text: "50Hz"
                 halign: "center"
             MDSlider:
+                id: 50Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -76,6 +88,8 @@ MDBoxLayout:
                 text: "63Hz"
                 halign: "center"
             MDSlider:
+                id: 63Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -86,6 +100,8 @@ MDBoxLayout:
                 text: "80Hz"
                 halign: "center"
             MDSlider:
+                id: 80Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -96,6 +112,8 @@ MDBoxLayout:
                 text: "100Hz"
                 halign: "center"
             MDSlider:
+                id: 100Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -106,6 +124,8 @@ MDBoxLayout:
                 text: "125Hz"
                 halign: "center"
             MDSlider:
+                id: 125Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -116,6 +136,8 @@ MDBoxLayout:
                 text: "160Hz"
                 halign: "center"
             MDSlider:
+                id: 160Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -126,6 +148,8 @@ MDBoxLayout:
                 text: "200Hz"
                 halign: "center"
             MDSlider:
+                id: 200Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -136,6 +160,8 @@ MDBoxLayout:
                 text: "250Hz"
                 halign: "center"
             MDSlider:
+                id: 250hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -146,26 +172,8 @@ MDBoxLayout:
                 text: "315Hz"
                 halign: "center"
             MDSlider:
-                value: 0
-                min: -12
-                max: 12
-                orientation: 'vertical'
-        MDBoxLayout:
-            orientation: "vertical"
-            MDLabel:
-                text: "250Hz"
-                halign: "center"
-            MDSlider:
-                value: 0
-                min: -12
-                max: 12
-                orientation: 'vertical'
-        MDBoxLayout:
-            orientation: "vertical"
-            MDLabel:
-                text: "315Hz"
-                halign: "center"
-            MDSlider:
+                id: 315Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -176,6 +184,8 @@ MDBoxLayout:
                 text: "630Hz"
                 halign: "center"
             MDSlider:
+                on_active: app.update_filter()
+                id: 630Hz
                 value: 0
                 min: -12
                 max: 12
@@ -186,6 +196,8 @@ MDBoxLayout:
                 text: "800Hz"
                 halign: "center"
             MDSlider:
+                id: 800Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -196,6 +208,8 @@ MDBoxLayout:
                 text: "1Khz"
                 halign: "center"
             MDSlider:
+                id: 1000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -206,6 +220,8 @@ MDBoxLayout:
                 text: "1,25KHz"
                 halign: "center"
             MDSlider:
+                id: 1250Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -216,6 +232,8 @@ MDBoxLayout:
                 text: "1,6KHz"
                 halign: "center"
             MDSlider:
+                id: 1600Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -226,6 +244,8 @@ MDBoxLayout:
                 text: "2KHz"
                 halign: "center"
             MDSlider:
+                id: 2000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -236,6 +256,8 @@ MDBoxLayout:
                 text: "2,5KHz"
                 halign: "center"
             MDSlider:
+                id: 2500Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -246,6 +268,8 @@ MDBoxLayout:
                 text: "3,15KHz"
                 halign: "center"
             MDSlider:
+                id: 3150Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -256,6 +280,8 @@ MDBoxLayout:
                 text: "4KHz"
                 halign: "center"
             MDSlider:
+                id: 4000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -266,6 +292,8 @@ MDBoxLayout:
                 text: "5KHz"
                 halign: "center"
             MDSlider:
+                id: 5000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -276,6 +304,8 @@ MDBoxLayout:
                 text: "6,3KHz"
                 halign: "center"
             MDSlider:
+                id: 6300Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -286,6 +316,8 @@ MDBoxLayout:
                 text: "8KHz"
                 halign: "center"
             MDSlider:
+                id: 8000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -296,6 +328,8 @@ MDBoxLayout:
                 text: "10KHz"
                 halign: "center"
             MDSlider:
+                id: 10000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -306,6 +340,8 @@ MDBoxLayout:
                 text: "12,5KHz"
                 halign: "center"
             MDSlider:
+                id: 12500Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -316,6 +352,8 @@ MDBoxLayout:
                 text: "16KHz"
                 halign: "center"
             MDSlider:
+                id: 16000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -326,6 +364,8 @@ MDBoxLayout:
                 text: "20KHz"
                 halign: "center"
             MDSlider:
+                id: 20000Hz
+                on_active: app.update_filter()
                 value: 0
                 min: -12
                 max: 12
@@ -337,6 +377,8 @@ MDBoxLayout:
         orientation: "vertical"
         padding: [250, 150, 250, 0]
         MDSlider:
+            id: volume
+            on_active: app.update_filter()
             value: 100
             min: 0
             max: 100
