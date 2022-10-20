@@ -1,0 +1,26 @@
+<Back>:
+    MDBoxLayout:
+        orientation: "vertical"
+        MDBoxLayout:
+            id: freq_resp
+            size_hint: [.6, 2.5]
+            pos_hint: {"center_y": .5, "center_x": .5}
+        MDFloatLayout:
+            MDFillRoundFlatIconButton:
+                icon: "content-save"
+                text: "Save Profile"
+                text_color: "#212121"
+                icon_color: "#212121"
+                md_bg_color: "#AAAAAA"
+                pos_hint: {"center_y": .65, "center_x": .42}
+                size_hint: [.13, .4]
+                on_release: app.change_screen()
+            MDFillRoundFlatIconButton:
+                icon: "folder-open"
+                text: "Load Profile"
+                text_color: "#212121"
+                icon_color: "#212121"
+                md_bg_color: "#AAAAAA"
+                pos_hint: {"center_y": .65, "center_x": .58}
+                size_hint: [.13, .4]
+                on_release: app.load_profile()

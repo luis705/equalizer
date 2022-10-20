@@ -1,0 +1,31 @@
+<Create>:
+    MDFloatLayout:
+        MDTopAppBar:
+            title: "Equapyzer"
+            pos_hint: {"top": 1}
+            left_action_items: [["close", lambda _: app.change_screen()]]
+        MDLabel:
+            halign: "center"
+            pos_hint: {"center_y": .8}
+            text: "Enter the file path"
+            text_color: [21,21,21]
+            font_style: "Subtitle1"
+        MDTextField:
+            pos_hint: {"center_x": .45, "center_y": .6}
+            size_hint: [.6, .1]
+            hint_text: "File folder"
+            helper_text_mode: "persistent"
+        MDIconButton:
+            pos_hint: {"center_x": .8, "center_y": .45}
+            icon: "folder-open"
+        MDTextField:
+            pos_hint: {"center_x": .45, "center_y": .45}
+            size_hint: [.6, .1]
+            hint_text: "File name"
+            helper_text: "(.json)"
+            helper_text_mode: "persistent"
+        MDFillRoundFlatButton:
+            pos_hint: {"center_x": .5, "center_y": .3}
+            text: "Confirm"
+            on_release: app.change_screen()
+                     
