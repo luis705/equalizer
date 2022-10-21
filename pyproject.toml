@@ -12,6 +12,7 @@ scipy = "^1.9.0"
 PyAudio = "^0.2.12"
 kivymd = "^1.1.1"
 Kivy-Garden = "^0.1.5"
+tk = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 blue = "^0.9.1"

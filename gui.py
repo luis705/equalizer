@@ -1,16 +1,14 @@
+import json
 import os
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 import matplotlib.pyplot as plt
 import numpy as np
 from kivy.config import Config
-from kivy.core.window import Window
 from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.lang import Builder
 from kivymd.app import MDApp
-from kivymd.uix.backdrop.backdrop import (
-    MDBackdropBackLayer,
-    MDBackdropFrontLayer,
-)
+from kivymd.uix.boxlayout import MDBoxLayout
 
 from eq import create_filter
 
@@ -42,15 +40,11 @@ colors = {
 }
 
 
-class Front(MDBackdropFrontLayer):
+class Front(MDBoxLayout):
     pass
 
 
-class Back(MDBackdropBackLayer):
-    pass
-
-
-class Create(MDBackdropBackLayer):
+class Back(MDBoxLayout):
     pass
 
 
@@ -71,14 +65,10 @@ class Equapyzer(MDApp):
         self.theme_cls.primary_palette = 'Teal'
         self.theme_cls.accent_palette = 'Red'
 
-        # Screen sizes
-        self.main_size = (1280, 720)
-        self.create_size = (400, 600)
-
         # Widget references
         self.main = Builder.load_file(os.path.join(self.kv_dir, 'main.kv'))
-        self.front = self.main.ids['front']
-        self.back = self.main.ids['back']
+        self.front = self.main.ids['gains']
+        self.back = self.main.ids['graph']
 
         # Eq values
         self.filter = []
@@ -94,20 +84,11 @@ class Equapyzer(MDApp):
         return self.main
 
     def update_filter(self):
-        # Adjust sound level
-        try:
-            gain = 0.01 / self.front.ids['volume'].value
-        except ZeroDivisionError:
-            gain = -10000000000
-
         # Get eq gains
         frequencies = list(
             filter(lambda id: 'Hz' in id, list(self.front.ids.keys()))
         )
-        gains = [
-            self.front.ids[frequencies[i]].value - gain
-            for i, _ in enumerate(frequencies)
-        ]
+        gains = [self.front.ids[freq].value for freq in frequencies]
         frequencies = list(
             map(lambda freq: int(freq[: freq.find('Hz')]), frequencies)
         )
@@ -148,19 +129,29 @@ class Equapyzer(MDApp):
         self.graph.add_widget(FigureCanvasKivyAgg(plt.gcf()))
 
     def load_profile(self):
-        ...
+        path = askopenfilename(
+            title='Select profile',
+            initialdir=self.profile_dir,
+            filetypes=[['json file', '.json']],
+        )
+        if not path:
+            return
+
+        with open(path, 'r') as f:
+            gains = json.loads(f.read())
+
+        for freq, gain in gains.items():
+            self.front.ids[freq + 'Hz'].value = gain
+
+        self.go_to_main()
 
     def save_profile(self):
-        try:
-            gain = 0.01 / self.front.ids['volume'].value
-        except ZeroDivisionError:
-            gain = -10000000000
         # Get eq gains
         frequencies = list(
             filter(lambda id: 'Hz' in id, list(self.front.ids.keys()))
         )
         gains = [
-            self.front.ids[frequencies[i]].value - gain
+            self.front.ids[frequencies[i]].value
             for i, _ in enumerate(frequencies)
         ]
         frequencies = list(
@@ -171,15 +162,27 @@ class Equapyzer(MDApp):
             frequency: gain for frequency, gain in zip(frequencies, gains)
         }
 
-    def change_screen(self):
-        if self.root.current == 'create':
-            self.root.current = 'main'
-            self.main.ids['create'].manager.transition.direction = 'left'
-            Window.size = self.main_size
-        else:
-            self.root.current = 'create'
-            Window.size = self.create_size
+        path = asksaveasfilename(
+            initialdir=self.profile_dir,
+            title='Select File',
+            filetypes=[['json file', '.json']],
+        )
+        if not path:
+            return
+        with open(path, 'w') as f:
+            f.write(json.dumps(to_save))
 
+    def go_to_graph(self):
+        # Select direction
+        match self.root.current:
+            case 'gains':
+                dir = 'down'
+            case 'create':
+                dir = 'right'
 
-if __name__ == '__main__':
-    Equapyzer().run()
+        self.root.current = 'graph'
+        self.main.transition.direction = dir
+
+    def go_to_main(self):
+        self.root.current = 'gains'
+        self.main.transition.direction = 'up'

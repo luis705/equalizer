@@ -1,6 +1,10 @@
 <Front>:
     MDBoxLayout:
         orientation: "vertical"
+        MDTopAppBar:
+            title: "Equapyzer"
+            pos_hint: {"top": 1}
+            left_action_items: [["arrow-up", lambda _: app.go_to_graph()]]
         MDGridLayout:
             padding: [50, 0, 50, 0]
             cols: 15

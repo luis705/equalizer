@@ -1,5 +1,5 @@
 run:
-	python gui.py
+	python main.py
 
 format:
 	isort *.py	

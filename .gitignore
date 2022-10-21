@@ -131,3 +131,6 @@ dmypy.json
 
 # Poetry
 poetry.lock
+
+# Project ignored directories
+profiles/
