@@ -1,10 +1,7 @@
 <Front>:
     MDBoxLayout:
         orientation: "vertical"
-        MDTopAppBar:
-            title: "Equapyzer"
-            pos_hint: {"top": 1}
-            left_action_items: [["arrow-up", lambda _: app.go_to_graph()]]
+        TopBar:
         MDGridLayout:
             padding: [50, 0, 50, 0]
             cols: 15
@@ -12,365 +9,184 @@
             row_default_height: 250
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "16Hz"
-                    halign: "center"
-                    valign: "top"
-                MDSlider:
+                GainSlider:
                     id: 16Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "20Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 20Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "25Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 25Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "31Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 31Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "40Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 40Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "50Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 50Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "63Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 63Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "80Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 80Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "100Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 100Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "125Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 125Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "160Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 160Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "200Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 200Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "250Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 250hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "315Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 315Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "630Hz"
-                    halign: "center"
-                MDSlider:
-                    on_active: app.update_filter()
+                GainSlider:
                     id: 630Hz
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "800Hz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 800Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "1Khz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 1000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "1,25KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 1250Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "1,6KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 1600Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "2KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 2000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "2,5KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 2500Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "3,15KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 3150Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "4KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 4000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "5KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 5000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "6,3KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 6300Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "8KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 8000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "10KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 10000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "12,5KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 12500Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "16KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 16000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
             MDBoxLayout:
                 orientation: "vertical"
-                MDLabel:
+                GainLabel:
                     text: "20KHz"
-                    halign: "center"
-                MDSlider:
+                GainSlider:
                     id: 20000Hz
-                    on_active: app.update_filter()
-                    value: 0
-                    min: -12
-                    max: 12
-                    orientation: 'vertical'
         MDBoxLayout:
             orientation: "vertical"
             padding: [250, 150, 250, 0]

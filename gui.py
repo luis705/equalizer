@@ -9,6 +9,10 @@ from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.label import MDLabel
+from kivymd.uix.slider import MDSlider
+from kivymd.uix.toolbar import MDTopAppBar
 
 from eq import create_filter
 
@@ -40,45 +44,60 @@ colors = {
 }
 
 
+class Back(MDBoxLayout):
+    pass
+
+
+class BackButtons(MDFloatLayout):
+    pass
+
+
 class Front(MDBoxLayout):
     pass
 
 
-class Back(MDBoxLayout):
+class GainLabel(MDLabel):
+    pass
+
+
+class GainSlider(MDSlider):
+    pass
+
+
+class TopBar(MDTopAppBar):
     pass
 
 
 class Equapyzer(MDApp):
     def build(self):
-        # Initialization
+        # Build .kv files
         self.kv_dir = 'gui_dir'
         for file in os.listdir(self.kv_dir):
             if file != 'main.kv':
                 Builder.load_file(os.path.join(self.kv_dir, file))
-        self.profile_dir = 'profiles'
 
+        # Setup profiles dir
+        self.profile_dir = 'profiles'
         if not os.path.exists(self.profile_dir):
             os.mkdir(self.profile_dir)
 
-        # Theme
+        # Setup theme
         self.theme_cls.colors = colors
         self.theme_cls.primary_palette = 'Teal'
         self.theme_cls.accent_palette = 'Red'
 
-        # Widget references
+        # Top widgets references
         self.main = Builder.load_file(os.path.join(self.kv_dir, 'main.kv'))
         self.front = self.main.ids['gains']
         self.back = self.main.ids['graph']
 
-        # Eq values
+        # Equalizer values
         self.filter = []
         self.fs = 98000
         self.order = 2**10 + 1
 
         # Frequency response graph
         self.graph = self.back.ids['freq_resp']
-
-        # Create first filter
         self.update_filter()
 
         return self.main
@@ -93,13 +112,13 @@ class Equapyzer(MDApp):
             map(lambda freq: int(freq[: freq.find('Hz')]), frequencies)
         )
 
-        # Add passband filter
+        # Add band-pass filter
         frequencies.insert(0, 0)
         frequencies.append(self.fs / 2)
         gains.insert(0, -100)
         gains.append(-100)
 
-        # Create filter
+        # Calculate filter coeficients
         self.filter = create_filter(
             np.array(frequencies), np.array(gains), self.fs, self.order
         )
@@ -143,7 +162,7 @@ class Equapyzer(MDApp):
         for freq, gain in gains.items():
             self.front.ids[freq + 'Hz'].value = gain
 
-        self.go_to_main()
+        self.change_screen()
 
     def save_profile(self):
         # Get eq gains
@@ -172,17 +191,13 @@ class Equapyzer(MDApp):
         with open(path, 'w') as f:
             f.write(json.dumps(to_save))
 
-    def go_to_graph(self):
-        # Select direction
+        self.change_screen()
+
+    def change_screen(self):
         match self.root.current:
+            case 'graph':
+                self.root.current = 'gains'
+                self.main.transition.direction = 'up'
             case 'gains':
-                dir = 'down'
-            case 'create':
-                dir = 'right'
-
-        self.root.current = 'graph'
-        self.main.transition.direction = dir
-
-    def go_to_main(self):
-        self.root.current = 'gains'
-        self.main.transition.direction = 'up'
+                self.root.current = 'graph'
+                self.main.transition.direction = 'down'
