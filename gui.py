@@ -94,7 +94,8 @@ class Equapyzer(MDApp):
         # Equalizer values
         self.filter = []
         self.fs = 98000
-        self.order = 2**10 + 1
+        self.order = 2**15 + 1
+        self.gain = 100
 
         # Frequency response graph
         self.graph = self.back.ids['freq_resp']
@@ -103,6 +104,9 @@ class Equapyzer(MDApp):
         return self.main
 
     def update_filter(self):
+        # Adjust sound level
+        self.gain = 100 - self.front.ids['volume'].value
+
         # Get eq gains
         frequencies = list(
             filter(lambda id: 'Hz' in id, list(self.front.ids.keys()))
@@ -112,10 +116,10 @@ class Equapyzer(MDApp):
             map(lambda freq: int(freq[: freq.find('Hz')]), frequencies)
         )
 
-        # Add band-pass filter
+        # Add low-pass filter
         frequencies.insert(0, 0)
         frequencies.append(self.fs / 2)
-        gains.insert(0, -100)
+        gains.insert(0, 0)
         gains.append(-100)
 
         # Calculate filter coeficients
@@ -130,16 +134,21 @@ class Equapyzer(MDApp):
         ax = fig.add_subplot(1, 1, 1)
         ax.patch.set_facecolor('#AAAAAA')
         fig.patch.set_facecolor('#AAAAAA')
-
-        plt.plot(
-            np.fft.rfftfreq(len(self.filter)) * self.fs,
-            10 * np.log10(abs(np.fft.rfft(self.filter))),
+        gains = np.abs(np.fft.rfft(self.filter))
+        frequencies = np.fft.rfftfreq(len(self.filter)) * self.fs
+        magnitude = np.multiply(20, np.log10(gains))
+        plt.semilogx(
+            frequencies,
+            magnitude,
             color='#212121',
         )
         plt.title('Frequency analysis')
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Filter Magnitude Response (dB)')
         plt.xlim([20, 20000])
+        plt.ylim([-15 ,15])
+        plt.yticks([-12, -9, -6, -3, 0, 3, 6, 9, 12])
+        plt.grid(True, which="both", color="#212121", alpha=0.2)
 
         # plt.grid(True, which='both', color="#212121")
 
