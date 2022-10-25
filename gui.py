@@ -13,8 +13,10 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.label import MDLabel
 from kivymd.uix.slider import MDSlider
 from kivymd.uix.toolbar import MDTopAppBar
+from kivymd.uix.menu import MDDropdownMenu
+import pyaudio 
 
-from eq import create_filter
+from eq import create_filter, process_signal
 
 Config.set('graphics', 'width', '1280')
 Config.set('graphics', 'height', '720')
@@ -69,39 +71,93 @@ class TopBar(MDTopAppBar):
 
 
 class Equapyzer(MDApp):
-    def build(self):
+    def __init__(self):
+        super().__init__()
+        
         # Build .kv files
         self.kv_dir = 'gui_dir'
         for file in os.listdir(self.kv_dir):
             if file != 'main.kv':
                 Builder.load_file(os.path.join(self.kv_dir, file))
 
-        # Setup profiles dir
-        self.profile_dir = 'profiles'
-        if not os.path.exists(self.profile_dir):
-            os.mkdir(self.profile_dir)
-
-        # Setup theme
-        self.theme_cls.colors = colors
-        self.theme_cls.primary_palette = 'Teal'
-        self.theme_cls.accent_palette = 'Red'
-
-        # Top widgets references
+        # Widgets references
         self.main = Builder.load_file(os.path.join(self.kv_dir, 'main.kv'))
         self.front = self.main.ids['gains']
+        self.volume = self.front.ids['volume']
         self.back = self.main.ids['graph']
+        self.in_menu_button = self.back.ids['back_buttons'].ids["in_menu"]
+        self.out_menu_button = self.back.ids['back_buttons'].ids["out_menu"]
 
         # Equalizer values
         self.filter = []
         self.fs = 98000
-        self.order = 2**15 + 1
+        self.order = 2**8 + 1
         self.gain = 100
 
         # Frequency response graph
         self.graph = self.back.ids['freq_resp']
         self.update_filter()
+        
+        # PyAudio api
+        self.pa = pyaudio.PyAudio()
+        info = self.pa.get_host_api_info_by_index(0)
+        self.devices = [self.pa.get_device_info_by_host_api_device_index(0, i) for i in range(info.get('deviceCount'))]
+        self.input_device =  self.pa.get_default_input_device_info()
+        self.output_device =  self.pa.get_default_output_device_info()
+        self.stream = self.pa.open(format=pyaudio.paInt32,
+                channels=1,
+                rate=48000,
+                input=True,
+                output=True,
+                stream_callback=self.callback,
+                frames_per_buffer=4096)
+        
+        
+        
+        
+        # Dropdown menu config
+        output_itens = [
+            {
+                "text": device.get('name'),
+                "viewclass": "OneLineListItem",
+                "on_release": lambda x=device: self.out_menu_callback(x),
+            } for device in self.devices if device.get('maxInputChannels') == 0 and device.get('maxOutputChannels') > 0 
+        ]
+        input_itens = [
+            {
+                "text": device.get('name'),
+                "viewclass": "OneLineListItem",
+                "on_release": lambda x=device: self.in_menu_callback(x),
+            } for device in self.devices if device.get('maxInputChannels') > 0 and device.get('maxOutputChannels') == 0 
+        ]
+        self.in_menu = MDDropdownMenu(
+            caller=self.in_menu_button,
+            items=input_itens,
+            width_mult=4,
+        )
+        self.out_menu = MDDropdownMenu(
+            caller=self.out_menu_button,
+            items=output_itens,
+            width_mult=4,
+        )
+        self.back.ids['back_buttons'].ids["in_menu"].text = "Input device: " + self.pa.get_default_input_device_info()['name']
+        self.back.ids['back_buttons'].ids["out_menu"].text = "Output device: " + self.pa.get_default_output_device_info()['name']
+
+                                                                
+
+    def build(self):
+        # Setup profiles dir
+        self.profile_dir = 'profiles'
+        if not os.path.exists(self.profile_dir):
+            os.mkdir(self.profile_dir)
+        
+        # Setup theme
+        self.theme_cls.colors = colors
+        self.theme_cls.primary_palette = 'Teal'
+        self.theme_cls.accent_palette = 'Red'
 
         return self.main
+
 
     def update_filter(self):
         # Adjust sound level
@@ -127,6 +183,7 @@ class Equapyzer(MDApp):
             np.array(frequencies), np.array(gains), self.fs, self.order
         )
         self.plot()
+
 
     def plot(self):
         plt.close()
@@ -156,6 +213,7 @@ class Equapyzer(MDApp):
             self.graph.remove_widget(self.graph.children[0])
         self.graph.add_widget(FigureCanvasKivyAgg(plt.gcf()))
 
+
     def load_profile(self):
         path = askopenfilename(
             title='Select profile',
@@ -171,7 +229,9 @@ class Equapyzer(MDApp):
         for freq, gain in gains.items():
             self.front.ids[freq + 'Hz'].value = gain
 
+        self.update_filter()
         self.change_screen()
+
 
     def save_profile(self):
         # Get eq gains
@@ -202,6 +262,7 @@ class Equapyzer(MDApp):
 
         self.change_screen()
 
+
     def change_screen(self):
         match self.root.current:
             case 'graph':
@@ -210,3 +271,42 @@ class Equapyzer(MDApp):
             case 'gains':
                 self.root.current = 'graph'
                 self.main.transition.direction = 'down'
+
+
+    def in_menu_callback(self, text_item):
+        self.input_device = text_item
+        self.stream.stop_stream()
+        self.stream = self.pa.open(format=pyaudio.paInt32,
+            channels=1,
+            rate=48000,
+            input=True,
+            output=True,
+            stream_callback=self.callback,
+            frames_per_buffer=4096,
+            input_device_index=self.input_device['index'],
+            output_device_index=self.output_device['index'])
+        self.back.ids['back_buttons'].ids["in_menu"].text = "Input device: " + self.input_device['name']
+        self.in_menu.dismiss()
+    
+
+    def out_menu_callback(self, text_item):
+        self.output_device = text_item
+        self.stream.stop_stream()
+        self.stream = self.pa.open(format=pyaudio.paInt32,
+            channels=1,
+            rate=48000,
+            input=True,
+            output=True,
+            stream_callback=self.callback,
+            frames_per_buffer=4096,
+            input_device_index=self.input_device['index'],
+            output_device_index=self.output_device['index'])  
+        self.back.ids['back_buttons'].ids["out_menu"].text = "Output device: " + self.output_device['name']
+        self.out_menu.dismiss()                          
+
+    def callback(self, in_data, frame_count, time_info, status):
+        in_data = np.frombuffer(in_data, dtype=np.int32)
+        if np.max(np.abs(in_data)) < 35000000:
+            return (np.zeros_like(in_data), pyaudio.paContinue)
+        out_data = process_signal(in_data, self.filter, self.volume.value / 100).astype(np.int32)
+        return (out_data, pyaudio.paContinue)
