@@ -15,6 +15,7 @@ from kivymd.uix.slider import MDSlider
 from kivymd.uix.toolbar import MDTopAppBar
 from kivymd.uix.menu import MDDropdownMenu
 import pyaudio 
+import matplotlib.patches as mpatches
 
 from eq import create_filter, process_signal
 
@@ -201,13 +202,169 @@ class Equapyzer(MDApp):
         )
         plt.title('Frequency analysis')
         plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Filter Magnitude Response (dB)')
+        plt.ylabel('Amplitude (dB)')
         plt.xlim([20, 20000])
-        plt.ylim([-15 ,15])
+        plt.ylim([-18 ,15])
         plt.yticks([-12, -9, -6, -3, 0, 3, 6, 9, 12])
         plt.grid(True, which="both", color="#212121", alpha=0.2)
+        plt.xticks([20, 100, 1000, 2000, 10000, 20000], ['20', '100', '1K', '2K', '10K', '20K'])
+        
+        # Broad ranges
+        # Bass
 
-        # plt.grid(True, which='both', color="#212121")
+        rect = mpatches.Rectangle((20.4, -18), 225.2, 2, 
+            fill=True,
+            facecolor="#357266")
+        plt.gca().add_patch(rect)
+        plt.text(70,
+                -17.25,
+                'Bass',
+                fontsize=12,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+
+        # Mid 
+        rect = mpatches.Rectangle((255, -18), 1710, 2, 
+            fill=True,
+            facecolor="#357266",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(700,
+                -17.25,
+                'Mid',
+                fontsize=12,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+	
+        # Treble
+        rect = mpatches.Rectangle((2040, -18), 17960, 2, 
+            fill=True,
+            facecolor="#357266",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(6000,
+                -17.25,
+                'Treble',
+                fontsize=12,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+
+        # Specific ranges
+        # Low bass
+        rect = mpatches.Rectangle((20.4, -15.75), 38, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(33,
+                -15,
+                'Low-Bass',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+
+        # Mid bass
+        rect = mpatches.Rectangle((61.2, -15.75), 55, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(85,
+                -15,
+                'Mid-Bass',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+
+        # High bass
+        rect = mpatches.Rectangle((120, -15.75), 370, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(250,
+                -15,
+                'High-Bass',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+
+        # Mid-mid
+        rect = mpatches.Rectangle((510, -15.75), 480, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(710,
+                -15,
+                'Mid-mid',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+        
+        # High-mid
+        rect = mpatches.Rectangle((1020, -15.75), 945, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(1420,
+                -15,
+                'High-mid',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+        
+        # Low-treble
+        rect = mpatches.Rectangle((2040, -15.75), 2920, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(3050,
+                -15,
+                'Low-treble',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+        
+        # Mid-treble
+        rect = mpatches.Rectangle((5000, -15.75), 4840, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(7000,
+                -15,
+                'Mid-treble',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+        
+        # High-treble
+        rect = mpatches.Rectangle((10200, -15.75), 9800, 2, 
+            fill=True,
+            facecolor="#945600",
+            )
+        plt.gca().add_patch(rect)
+        plt.text(14500,
+                -15,
+                'High-treble',
+                fontsize=10,
+                color="#212121",
+                verticalalignment='center',
+                horizontalalignment='center')
+       
 
         while len(self.graph.children) != 0:
             self.graph.remove_widget(self.graph.children[0])
