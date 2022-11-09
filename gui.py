@@ -499,13 +499,13 @@ class Equapyzer(MDApp):
         self.change_screen()
 
     def change_screen(self):
-        match self.root.current:
-            case 'graph':
-                self.root.current = 'gains'
-                self.main.transition.direction = 'up'
-            case 'gains':
-                self.root.current = 'graph'
-                self.main.transition.direction = 'down'
+        if self.root.current == 'graph':
+            self.root.current = 'gains'
+            self.main.transition.direction = 'up'
+        elif self.root.current == 'gains':
+            self.root.current = 'graph'
+            self.main.transition.direction = 'down'
+
 
     def in_menu_callback(self, text_item):
         self.input_device = text_item
