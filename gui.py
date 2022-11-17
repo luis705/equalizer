@@ -21,6 +21,7 @@ from eq import create_filter, process_signal
 
 Config.set('graphics', 'width', '1024')
 Config.set('graphics', 'height', '570')
+Config.set('graphics', 'fullscreen', 1)
 Config.set('graphics', 'resizable', 0)
 Config.write()
 
@@ -95,6 +96,7 @@ class Equapyzer(MDApp):
         self.filter = []
         self.fs = 48000
         self.order = 2**16 + 1
+        self.buffer = 8192
 
         # Frequency response graph
         self.graph = self.back.ids['freq_resp']
@@ -103,6 +105,7 @@ class Equapyzer(MDApp):
         # PyAudio api
         self.pa = pyaudio.PyAudio()
         info = self.pa.get_host_api_info_by_index(0)
+        
         self.devices = [
             self.pa.get_device_info_by_host_api_device_index(0, i)
             for i in range(info.get('deviceCount'))
@@ -112,11 +115,11 @@ class Equapyzer(MDApp):
         self.stream = self.pa.open(
             format=pyaudio.paInt32,
             channels=1,
-            rate=48000,
+            rate=self.fs,
             input=True,
             output=True,
             stream_callback=self.callback,
-            frames_per_buffer=4096,
+            frames_per_buffer=self.buffer,
         )
 
         # Dropdown menu config
@@ -192,10 +195,10 @@ class Equapyzer(MDApp):
         gains.append(-100)
 
         # Calculate filter coeficients
-        self.filter = create_filter(
+        temp = create_filter(
             np.array(frequencies), np.array(gains), self.fs, self.order
         )
-
+        self.filter = temp
     def plot(self):
         plt.close()
         fig = plt.figure()
@@ -224,7 +227,6 @@ class Equapyzer(MDApp):
 
         # Broad ranges
         # Bass
-
         rect = mpatches.Rectangle(
             (20.4, -18), 225.2, 2, fill=True, facecolor='#357266'
         )
@@ -233,7 +235,7 @@ class Equapyzer(MDApp):
             70,
             -17.25,
             'Bass',
-            fontsize=12,
+            fontsize=10,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -252,7 +254,7 @@ class Equapyzer(MDApp):
             700,
             -17.25,
             'Mid',
-            fontsize=12,
+            fontsize=10,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -271,7 +273,7 @@ class Equapyzer(MDApp):
             6000,
             -17.25,
             'Treble',
-            fontsize=12,
+            fontsize=10,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -291,7 +293,7 @@ class Equapyzer(MDApp):
             33,
             -15,
             'Low-Bass',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -310,7 +312,7 @@ class Equapyzer(MDApp):
             85,
             -15,
             'Mid-Bass',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -329,7 +331,7 @@ class Equapyzer(MDApp):
             250,
             -15,
             'High-Bass',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -348,7 +350,7 @@ class Equapyzer(MDApp):
             710,
             -15,
             'Mid-mid',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -367,7 +369,7 @@ class Equapyzer(MDApp):
             1420,
             -15,
             'High-mid',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -386,7 +388,7 @@ class Equapyzer(MDApp):
             3050,
             -15,
             'Low-treble',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -405,7 +407,7 @@ class Equapyzer(MDApp):
             7000,
             -15,
             'Mid-treble',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -424,7 +426,7 @@ class Equapyzer(MDApp):
             14500,
             -15,
             'High-treble',
-            fontsize=10,
+            fontsize=8,
             color='#212121',
             verticalalignment='center',
             horizontalalignment='center',
@@ -482,10 +484,10 @@ class Equapyzer(MDApp):
         self.change_screen()
 
     def change_screen(self):
-        if self.root.current == 'gains':
+        if self.root.current == 'graph':
             self.root.current = 'gains'
             self.main.transition.direction = 'up'
-        else:
+        elif self.root.current == 'gains':
             self.root.current = 'graph'
             self.main.transition.direction = 'down'
             self.plot()
@@ -496,11 +498,11 @@ class Equapyzer(MDApp):
         self.stream = self.pa.open(
             format=pyaudio.paInt32,
             channels=1,
-            rate=48000,
+            rate=self.fs,
             input=True,
             output=True,
             stream_callback=self.callback,
-            frames_per_buffer=4096,
+            frames_per_buffer=self.buffer,
             input_device_index=self.input_device['index'],
             output_device_index=self.output_device['index'],
         )
@@ -515,11 +517,11 @@ class Equapyzer(MDApp):
         self.stream = self.pa.open(
             format=pyaudio.paInt32,
             channels=1,
-            rate=48000,
+            rate=self.fs,
             input=True,
             output=True,
             stream_callback=self.callback,
-            frames_per_buffer=4096,
+            frames_per_buffer=self.buffer,
             input_device_index=self.input_device['index'],
             output_device_index=self.output_device['index'],
         )
