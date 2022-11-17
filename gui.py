@@ -19,8 +19,8 @@ from kivymd.uix.toolbar import MDTopAppBar
 
 from eq import create_filter, process_signal
 
-Config.set('graphics', 'width', '1280')
-Config.set('graphics', 'height', '720')
+Config.set('graphics', 'width', '1024')
+Config.set('graphics', 'height', '570')
 Config.set('graphics', 'resizable', 0)
 Config.write()
 
@@ -88,12 +88,13 @@ class Equapyzer(MDApp):
         self.back = self.main.ids['graph']
         self.in_menu_button = self.back.ids['back_buttons'].ids['in_menu']
         self.out_menu_button = self.back.ids['back_buttons'].ids['out_menu']
+        self.sliders = self.front.ids
+        self.sliders.pop('volume')
 
         # Equalizer values
         self.filter = []
-        self.fs = 98000
-        self.order = 2**8 + 1
-        self.gain = 100
+        self.fs = 48000
+        self.order = 2**16 + 1
 
         # Frequency response graph
         self.graph = self.back.ids['freq_resp']
@@ -171,14 +172,15 @@ class Equapyzer(MDApp):
         return self.main
 
     def update_filter(self):
+        for key, value in self.sliders.items():
+            if value.active:
+                return
         # Adjust sound level
-        self.gain = 100 - self.front.ids['volume'].value
+        self.gain = 100 - self.volume.value
 
         # Get eq gains
-        frequencies = list(
-            filter(lambda id: 'Hz' in id, list(self.front.ids.keys()))
-        )
-        gains = [self.front.ids[freq].value for freq in frequencies]
+        frequencies = list(self.sliders.keys())
+        gains = [self.sliders[freq].value for freq in frequencies]
         frequencies = list(
             map(lambda freq: int(freq[: freq.find('Hz')]), frequencies)
         )
@@ -193,7 +195,6 @@ class Equapyzer(MDApp):
         self.filter = create_filter(
             np.array(frequencies), np.array(gains), self.fs, self.order
         )
-        self.plot()
 
     def plot(self):
         plt.close()
@@ -223,6 +224,7 @@ class Equapyzer(MDApp):
 
         # Broad ranges
         # Bass
+
         rect = mpatches.Rectangle(
             (20.4, -18), 225.2, 2, fill=True, facecolor='#357266'
         )
@@ -259,7 +261,7 @@ class Equapyzer(MDApp):
         # Treble
         rect = mpatches.Rectangle(
             (2040, -18),
-            17610,
+            17960,
             2,
             fill=True,
             facecolor='#357266',
@@ -317,35 +319,16 @@ class Equapyzer(MDApp):
         # High bass
         rect = mpatches.Rectangle(
             (120, -15.75),
-            125.6,
+            370,
             2,
             fill=True,
             facecolor='#945600',
         )
         plt.gca().add_patch(rect)
         plt.text(
-            175,
+            250,
             -15,
             'High-Bass',
-            fontsize=10,
-            color='#212121',
-            verticalalignment='center',
-            horizontalalignment='center',
-        )
-
-        # Low-mid
-        rect = mpatches.Rectangle(
-            (255, -15.75),
-            240,
-            2,
-            fill=True,
-            facecolor='#945600',
-        )
-        plt.gca().add_patch(rect)
-        plt.text(
-            360,
-            -15,
-            'Low-mid',
             fontsize=10,
             color='#212121',
             verticalalignment='center',
@@ -393,7 +376,7 @@ class Equapyzer(MDApp):
         # Low-treble
         rect = mpatches.Rectangle(
             (2040, -15.75),
-            2900,
+            2920,
             2,
             fill=True,
             facecolor='#945600',
@@ -411,7 +394,7 @@ class Equapyzer(MDApp):
 
         # Mid-treble
         rect = mpatches.Rectangle(
-            (5100, -15.75),
+            (5000, -15.75),
             4840,
             2,
             fill=True,
@@ -431,14 +414,14 @@ class Equapyzer(MDApp):
         # High-treble
         rect = mpatches.Rectangle(
             (10200, -15.75),
-            9450,
+            9800,
             2,
             fill=True,
             facecolor='#945600',
         )
         plt.gca().add_patch(rect)
         plt.text(
-            14300,
+            14500,
             -15,
             'High-treble',
             fontsize=10,
@@ -499,13 +482,13 @@ class Equapyzer(MDApp):
         self.change_screen()
 
     def change_screen(self):
-        if self.root.current == 'graph':
+        if self.root.current == 'gains':
             self.root.current = 'gains'
             self.main.transition.direction = 'up'
-        elif self.root.current == 'gains':
+        else:
             self.root.current = 'graph'
             self.main.transition.direction = 'down'
-
+            self.plot()
 
     def in_menu_callback(self, text_item):
         self.input_device = text_item
@@ -549,6 +532,7 @@ class Equapyzer(MDApp):
         in_data = np.frombuffer(in_data, dtype=np.int32)
         if np.max(np.abs(in_data)) < 35000000:
             return (np.zeros_like(in_data), pyaudio.paContinue)
+
         out_data = process_signal(
             in_data, self.filter, self.volume.value / 100
         ).astype(np.int32)
