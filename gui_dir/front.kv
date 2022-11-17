@@ -3,10 +3,10 @@
         orientation: "vertical"
         TopBar:
         MDGridLayout:
-            padding: [50, 0, 50, 0]
+            padding: [50, 0, 50, 200]
             cols: 15
             rows: 2
-            row_default_height: 200
+            row_default_height: 250
             MDBoxLayout:
                 orientation: "vertical"
                 GainLabel:
@@ -188,8 +188,12 @@
                 GainSlider:
                     id: 20000Hz
         MDBoxLayout:
-            orientation: "vertical"
-            padding: [250, 150, 250, 0]
+            orientation: "horizontal"
+            padding: [100, 200, 100, 0]    
+            MDLabel:
+                text: "Volume"
+                valign: "center"
+                size_hint_x: .1
             MDSlider:
                 id: volume
                 on_active: app.update_filter()
@@ -197,3 +201,7 @@
                 min: 0
                 max: 100
                 orientation: 'horizontal'
+            
+            
+            
+            

@@ -1,5 +1,6 @@
 import json
 import os
+from time import time
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 import matplotlib.patches as mpatches
@@ -20,7 +21,7 @@ from kivymd.uix.toolbar import MDTopAppBar
 from eq import create_filter, process_signal
 
 Config.set('graphics', 'width', '1024')
-Config.set('graphics', 'height', '570')
+Config.set('graphics', 'height', '600')
 Config.set('graphics', 'fullscreen', 1)
 Config.set('graphics', 'resizable', 0)
 Config.write()
@@ -82,6 +83,9 @@ class Equapyzer(MDApp):
             if file != 'main.kv':
                 Builder.load_file(os.path.join(self.kv_dir, file))
 
+        # Screen change time
+        self.time = time()
+
         # Widgets references
         self.main = Builder.load_file(os.path.join(self.kv_dir, 'main.kv'))
         self.front = self.main.ids['gains']
@@ -105,7 +109,7 @@ class Equapyzer(MDApp):
         # PyAudio api
         self.pa = pyaudio.PyAudio()
         info = self.pa.get_host_api_info_by_index(0)
-        
+
         self.devices = [
             self.pa.get_device_info_by_host_api_device_index(0, i)
             for i in range(info.get('deviceCount'))
@@ -199,6 +203,7 @@ class Equapyzer(MDApp):
             np.array(frequencies), np.array(gains), self.fs, self.order
         )
         self.filter = temp
+
     def plot(self):
         plt.close()
         fig = plt.figure()
@@ -484,6 +489,8 @@ class Equapyzer(MDApp):
         self.change_screen()
 
     def change_screen(self):
+        if time() - self.time < 0.5:
+            return
         if self.root.current == 'graph':
             self.root.current = 'gains'
             self.main.transition.direction = 'up'
@@ -491,6 +498,7 @@ class Equapyzer(MDApp):
             self.root.current = 'graph'
             self.main.transition.direction = 'down'
             self.plot()
+        self.time = time()
 
     def in_menu_callback(self, text_item):
         self.input_device = text_item

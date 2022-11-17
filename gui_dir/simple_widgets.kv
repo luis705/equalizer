@@ -2,6 +2,7 @@
     title: "Equapyzer"
     pos_hint: {"top": 1}
     left_action_items: [["menu", lambda _: app.change_screen()]]
+    icon_size: 2
 
 
 <BackButtons>:
@@ -42,9 +43,10 @@
     min: -12
     max: 12
     orientation: 'vertical'
+    
 
 
 <GainLabel>:
-    text: "16Hz"
     halign: "center"
     valign: "top"
+    size_hint_y: .3
