@@ -102,10 +102,6 @@ class Equapyzer(MDApp):
         self.order = 2**16 + 1
         self.buffer = 8192
 
-        # Frequency response graph
-        self.graph = self.back.ids['freq_resp']
-        self.update_filter()
-
         # PyAudio api
         self.pa = pyaudio.PyAudio()
         info = self.pa.get_host_api_info_by_index(0)
@@ -124,7 +120,13 @@ class Equapyzer(MDApp):
             output=True,
             stream_callback=self.callback,
             frames_per_buffer=self.buffer,
+            input_device_index=self.input_device['index'],
+            output_device_index=self.output_device['index'],
         )
+
+        # Frequency response graph
+        self.graph = self.back.ids['freq_resp']
+        self.update_filter()
 
         # Dropdown menu config
         output_itens = [
@@ -179,6 +181,7 @@ class Equapyzer(MDApp):
         return self.main
 
     def update_filter(self):
+        self.stream.stop_stream()
         for key, value in self.sliders.items():
             if value.active:
                 return
@@ -203,6 +206,7 @@ class Equapyzer(MDApp):
             np.array(frequencies), np.array(gains), self.fs, self.order
         )
         self.filter = temp
+        self.stream.start_stream()
 
     def plot(self):
         plt.close()
