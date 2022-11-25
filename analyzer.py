@@ -4,10 +4,10 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.io.wavfile import read, write
 from moviepy import *
 from moviepy.editor import *
 from moviepy.video.io.bindings import mplfig_to_npimage
+from scipy.io.wavfile import read, write
 
 from eq import create_filter, process_signal
 
@@ -27,8 +27,12 @@ def help():
     print(
         '\t\t-f [--frequency] update frequency of the created animation (fps) [default=10]'
     )
-    print('\t\t-b [--buffer] buffer size, size of the FFT window in samples (default=512)')
-    print('\t\t-a [--audio] creates video with audio. This cannot be used with -b neither -f')
+    print(
+        '\t\t-b [--buffer] buffer size, size of the FFT window in samples (default=512)'
+    )
+    print(
+        '\t\t-a [--audio] creates video with audio. This cannot be used with -b neither -f'
+    )
     sys.exit()
 
 
@@ -41,41 +45,48 @@ def psd_y(signal):
 
 def psd_x(signal):
     fft = np.abs(np.fft.fft(signal))
-    x = np.fft.fftfreq(len(fft), d=1/Fs)
+    x = np.fft.fftfreq(len(fft), d=1 / Fs)
     return x[: len(fft) // 2]
 
 
-
 def make_frame(t):
-    frame = int(t * frequency) # Convert time to frame number
-   
+    frame = int(t * frequency)   # Convert time to frame number
+
     # Axis (0, 0): input time plot
     axs[0, 0].clear()
     axs[0, 0].plot(x_frames[frame], input_frames[frame])
     axs[0, 0].set_xlim(x_frames[frame].min(), x_frames[frame].max())
-    axs[0 ,0].set_ylim(1.5 * input_frames[frame].min(), 1.5 * input_frames[frame].max())
-    
+    axs[0, 0].set_ylim(
+        1.5 * input_frames[frame].min(), 1.5 * input_frames[frame].max()
+    )
+
     # Axis (1, 0): output time plot
     axs[1, 0].clear()
     axs[1, 0].plot(x_frames[frame], output_frames[frame])
     axs[1, 0].set_xlim(x_frames[frame].min(), x_frames[frame].max())
-    axs[1 ,0].set_ylim(1.5 * input_frames[frame].min(), 1.5 * input_frames[frame].max())
+    axs[1, 0].set_ylim(
+        1.5 * input_frames[frame].min(), 1.5 * input_frames[frame].max()
+    )
 
     # Axis (0, 1): input frequency plot
     axs[0, 1].clear()
-    axs[0, 1].plot(input_frequency_x_frames[frame], input_frequency_y_frames[frame])
+    axs[0, 1].plot(
+        input_frequency_x_frames[frame], input_frequency_y_frames[frame]
+    )
     axs[0, 1].set_ylim(-12, 2)
-    
+
     # Axis (1, 1): output frequency plot
-    axs[1, 1].clear()            
-    axs[1, 1].plot(output_frequency_x_frames[frame], output_frequency_y_frames[frame])
+    axs[1, 1].clear()
+    axs[1, 1].plot(
+        output_frequency_x_frames[frame], output_frequency_y_frames[frame]
+    )
     axs[1, 1].set_ylim(-12, 2)
-    
+
     return mplfig_to_npimage(fig)
 
 
 plt.ion()
-np.seterr(all="ignore")
+np.seterr(all='ignore')
 
 
 # Get cli arguments
@@ -84,7 +95,16 @@ try:
     opts, args = getopt.gnu_getopt(
         argv,
         'p:i:o:h:f:a:b:',
-        ['profile=', 'input=', 'output=', 'help', 'frequency=', 'display=', 'buffer=', 'audio='],
+        [
+            'profile=',
+            'input=',
+            'output=',
+            'help',
+            'frequency=',
+            'display=',
+            'buffer=',
+            'audio=',
+        ],
     )
 except:
     help()
@@ -124,7 +144,6 @@ for opt, value in opts:
             a_set = True
         except AssertionError:
             print('Audio must be one of `in` or `out`')
-        
 if a_set and (b_set or f_set):
     print('When audio is set neither buffer size nor frequency can be passed')
     help()
@@ -168,9 +187,18 @@ fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(16, 10))
 
 
 # Get plotting frames
-x_frames = [np.linspace(frame * frame_duration, (frame + 1) * frame_duration, buff_size) for frame in range(n_frames)]
-input_frames = [s[frame * buff_size: (frame + 1) * buff_size] for frame in range(n_frames)]
-output_frames = list(map(lambda window: process_signal(window, filter, gain=1), input_frames))
+x_frames = [
+    np.linspace(
+        frame * frame_duration, (frame + 1) * frame_duration, buff_size
+    )
+    for frame in range(n_frames)
+]
+input_frames = [
+    s[frame * buff_size : (frame + 1) * buff_size] for frame in range(n_frames)
+]
+output_frames = list(
+    map(lambda window: process_signal(window, filter, gain=1), input_frames)
+)
 
 # PSD frames
 input_frequency_x_frames = list(map(psd_x, input_frames))
