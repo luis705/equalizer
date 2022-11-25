@@ -14,7 +14,7 @@ kivymd = "^1.1.1"
 Kivy-Garden = "^0.1.5"
 tk = "^0.1.0"
 isort = "^5.10.1"
-tqdm = "^4.64.1"
+moviepy = "^1.0.3"
 
 [tool.poetry.dev-dependencies]
 blue = "^0.9.1"

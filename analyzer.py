@@ -4,9 +4,10 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.animation import FuncAnimation
-from scipy.io.wavfile import read
-from tqdm import tqdm
+from scipy.io.wavfile import read, write
+from moviepy import *
+from moviepy.editor import *
+from moviepy.video.io.bindings import mplfig_to_npimage
 
 from eq import create_filter, process_signal
 
@@ -26,82 +27,55 @@ def help():
     print(
         '\t\t-f [--frequency] update frequency of the created animation (fps) [default=10]'
     )
-    print('\t\t-d [--display] display interval of saving progress (default=10)')
     print('\t\t-b [--buffer] buffer size, size of the FFT window in samples (default=512)')
+    print('\t\t-a [--audio] creates video with audio. This cannot be used with -b neither -f')
     sys.exit()
 
 
-def init():
-    axs[0, 0].set(title='Input sound', xlabel='time (s)', ylabel='Magnitude')
-    axs[0, 0].set_ylim(1.2 * min, 1.2 * max)
-    
-    axs[0, 1].set_xlim(0, 22000)
-    axs[0, 1].set_ylim(-20, 5)
-    
-
-    axs[1, 0].set(title='Output sound', xlabel='time (s)', ylabel='Magnitude')
-    axs[1, 0].set_ylim(1.2 * min, 1.2 * max)
-
-    axs[1, 1].set_xlim(0, 20000)
-    axs[1, 1].set_ylim(-20, 5)
-
-
-def update(frame):
-    for i in range(frame * buff_size, (frame + 1) * buff_size):
-        xdata.append(xframes[i])
-        ydata.append(yframes[i])
-    axs[0, 0].set_xlim(frame * buff_size * dt, (frame + 1) * buff_size * dt)
-    line[0].set_data(xdata, ydata)
-
-    fft = np.abs(np.fft.fft(yframes[frame * buff_size : (frame + 1) * buff_size]))
-    x = np.fft.fftfreq(len(fft), d=dt)
-    fft, x = fft[: len(fft) // 2], x[: len(fft) // 2]
+def psd_y(signal):
+    fft = np.abs(np.fft.fft(signal))
+    fft = fft[: len(fft) // 2]
     reference = 2 * np.sum(fft)
-    y = 10 * np.log10(fft / reference)
+    return 10 * np.log10(fft / reference)
+
+
+def psd_x(signal):
+    fft = np.abs(np.fft.fft(signal))
+    x = np.fft.fftfreq(len(fft), d=1/Fs)
+    return x[: len(fft) // 2]
+
+
+
+def make_frame(t):
+    frame = int(t * frequency) # Convert time to frame number
+   
+    # Axis (0, 0): input time plot
+    axs[0, 0].clear()
+    axs[0, 0].plot(x_frames[frame], input_frames[frame])
+    axs[0, 0].set_xlim(x_frames[frame].min(), x_frames[frame].max())
+    axs[0 ,0].set_ylim(1.5 * input_frames[frame].min(), 1.5 * input_frames[frame].max())
+    
+    # Axis (1, 0): output time plot
+    axs[1, 0].clear()
+    axs[1, 0].plot(x_frames[frame], output_frames[frame])
+    axs[1, 0].set_xlim(x_frames[frame].min(), x_frames[frame].max())
+    axs[1 ,0].set_ylim(1.5 * input_frames[frame].min(), 1.5 * input_frames[frame].max())
+
+    # Axis (0, 1): input frequency plot
     axs[0, 1].clear()
-    axs[0, 1].semilogx(x, y)
-    axs[0, 1].set(
-        title='Input sound spectrum',
-        xlabel='Frequency (Hz)',
-        ylabel='Magnitude (dB)',
-        xlim=(20, 20000),
-        ylim=(-20, 5),
-    )
-    axs[0, 1].set_xticks(
-        [20, 100, 1000, 2000, 10000, 20000],
-        ['20', '100', '1K', '2K', '10K', '20K'],
-    )
-    line[1].set_data(x, y)
+    axs[0, 1].plot(input_frequency_x_frames[frame], input_frequency_y_frames[frame])
+    axs[0, 1].set_ylim(-12, 2)
+    
+    # Axis (1, 1): output frequency plot
+    axs[1, 1].clear()            
+    axs[1, 1].plot(output_frequency_x_frames[frame], output_frequency_y_frames[frame])
+    axs[1, 1].set_ylim(-12, 2)
+    
+    return mplfig_to_npimage(fig)
 
-    output = process_signal(
-        yframes[frame * buff_size : (frame + 1) * buff_size], filter, gain=1
-    )
 
-    for out in output:
-        yout.append(out)
-    axs[1, 0].set_xlim(frame * buff_size * dt, (frame + 1) * buff_size * dt)
-    line[2].set_data(xdata, yout)
-
-    fft = np.abs(np.fft.fft(output))
-    x = np.fft.fftfreq(len(fft), d=dt)
-    fft, x = fft[: len(fft) // 2], x[: len(fft) // 2]
-    reference = 2 * np.sum(fft)
-    y = 10 * np.log10(fft / reference)
-    axs[1, 1].clear()
-    axs[1, 1].semilogx(x, y)
-    axs[1, 1].set(
-        title='Output sound spectrum',
-        xlabel='Frequency (Hz)',
-        ylabel='Magnitude (dB)',
-        xlim=(20, 20000),
-        ylim=(-20, 5),
-    )
-    axs[1, 1].set_xticks(
-        [20, 100, 1000, 2000, 10000, 20000],
-        ['20', '100', '1K', '2K', '10K', '20K'],
-    )
-    line[3].set_data(x, y)
-    return line
+plt.ion()
+np.seterr(all="ignore")
 
 
 # Get cli arguments
@@ -109,8 +83,8 @@ argv = sys.argv[1:]
 try:
     opts, args = getopt.gnu_getopt(
         argv,
-        'p:i:o:h:f:d:b:',
-        ['profile=', 'input=', 'output=', 'help', 'frequency=', 'display=', 'buffer='],
+        'p:i:o:h:f:a:b:',
+        ['profile=', 'input=', 'output=', 'help', 'frequency=', 'display=', 'buffer=', 'audio='],
     )
 except:
     help()
@@ -118,6 +92,7 @@ except:
 profile_path, input_path, output_path = None, None, None
 frequency, display = 10, 10
 buff_size = 512
+a_set, b_set, f_set = False, False, False
 for opt, value in opts:
     if opt in ['-h', '--helpt']:
         help()
@@ -130,37 +105,33 @@ for opt, value in opts:
     elif opt in ['-f', '--frequency']:
         try:
             frequency = int(value)
+            f_set = True
         except ValueError:
             print('Frequency value must be an integer!')
-            help()
-    elif opt in ['-d', '--display']:
-        try:
-            display = int(value)
-        except ValueError:
-            print('Display interval must be an integer!')
             help()
     elif opt in ['-b', '--buffer']:
         try:
             buff_size = int(value)
+            b_set = True
         except ValueError:
             print('Buffer size must be an integer!')
             help()
+    elif opt in ['-a', '--audio']:
+        try:
+            assert value in ['in', 'out']
+            audio = value
+            frequency = 30
+            a_set = True
+        except AssertionError:
+            print('Audio must be one of `in` or `out`')
+        
+if a_set and (b_set or f_set):
+    print('When audio is set neither buffer size nor frequency can be passed')
+    help()
 
 if profile_path is None or input_path is None or output_path is None:
     help()
 
-
-plt.ion()
-np.seterr(all="ignore")
-
-# Configure animation plots
-fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(16, 10))
-xdata, ydata, yout = [], [], []
-(ln1,) = axs[0, 0].plot([], [])
-(ln2,) = axs[0, 1].plot([], [])
-(ln3,) = axs[1, 0].plot([], [])
-(ln4,) = axs[1, 1].plot([], [])
-line = [ln1, ln2, ln3, ln4]
 
 # Get .wav data
 Fs, s = read(input_path)
@@ -171,12 +142,15 @@ except IndexError:
     ...
 
 # Sound info
-max, min = max(s), min(s)
-dt = 1 / Fs
-n_buffs = len(s) // buff_size
-time = len(s) * dt
-xframes = np.linspace(0, time, len(s))
-yframes = s
+n_samples = len(s)
+total_duration = n_samples / Fs
+n_frames = int(n_samples * frequency / (Fs))
+frame_duration = total_duration / n_frames
+
+# Calculate buff_size if needed
+if a_set:
+    buff_size = int(n_samples / n_frames)
+
 
 # Get equalizer data
 with open(profile_path, 'r') as f:
@@ -188,14 +162,33 @@ gains.insert(0, 0)
 gains.append(-100)
 filter = create_filter(freqs, gains, Fs, 2**16 - 1)
 
+
+# Configure animation plots
+fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(16, 10))
+
+
+# Get plotting frames
+x_frames = [np.linspace(frame * frame_duration, (frame + 1) * frame_duration, buff_size) for frame in range(n_frames)]
+input_frames = [s[frame * buff_size: (frame + 1) * buff_size] for frame in range(n_frames)]
+output_frames = list(map(lambda window: process_signal(window, filter, gain=1), input_frames))
+
+# PSD frames
+input_frequency_x_frames = list(map(psd_x, input_frames))
+input_frequency_y_frames = list(map(psd_y, input_frames))
+output_frequency_x_frames = list(map(psd_x, output_frames))
+output_frequency_y_frames = list(map(psd_y, output_frames))
+
+
 # Create and save animation
-p_bar = tqdm(range(n_buffs), desc='Saving animation')
-ani = FuncAnimation(
-    fig,
-    update,
-    frames=range(n_buffs),
-    init_func=init,
-    repeat=False,
-    interval=1000 / frequency,
-)
-ani.save(output_path, progress_callback=lambda curr, total: p_bar.update())
+animation = VideoClip(make_frame, duration=total_duration)
+if a_set:
+    if audio == 'in':
+        animation.audio = AudioFileClip(input_path)
+    elif audio == 'out':
+        full_audio = np.append(output_frames[0], output_frames[1:])
+        write('tmp.wav', Fs, full_audio)
+        animation.audio = AudioFileClip('tmp.wav')
+animation.write_videofile(output_path, fps=frequency)
+
+if os.path.exists('tmp.wav'):
+    os.remove('tmp.wav')

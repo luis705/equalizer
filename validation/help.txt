@@ -1,0 +1,7 @@
+To validate the software run generate_seep.py and then the spectrum analyser using sweep.wav as input sound:
+
+To get video with ouput sound:
+python .\analyzer.py -p .\profiles\a.json -i chirp.wav -o sweep_out.mp4 -a out
+
+To get video with input sound:
+python .\analyzer.py -p .\profiles\a.json -i chirp.wav -o sweep_in.mp4 -a in
