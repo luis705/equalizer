@@ -134,3 +134,9 @@ poetry.lock
 
 # Project ignored directories
 profiles/
+
+# Test and validation files
+*.wav
+*.mp4
+validation/*.wav
+validation/*.mp4
