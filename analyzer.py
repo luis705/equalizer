@@ -1,6 +1,7 @@
 import getopt
 import json
 import sys
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,15 +39,16 @@ def help():
 
 def psd_y(signal):
     fft = np.abs(np.fft.fft(signal))
-    fft = fft[: len(fft) // 2]
-    reference = 2 * np.sum(fft)
-    return 10 * np.log10(fft / reference)
+    fft = fft[:len(fft) // 2]
+    reference = 2 ** 16
+    response = 20*np.log10(fft / reference)
+    return response
 
 
 def psd_x(signal):
     fft = np.abs(np.fft.fft(signal))
-    x = np.fft.fftfreq(len(fft), d=1 / Fs)
-    return x[: len(fft) // 2]
+    x = np.fft.fftfreq(len(fft), d=1 / Fs)[: len(fft) // 2]
+    return x
 
 
 def make_frame(t):
@@ -73,14 +75,16 @@ def make_frame(t):
     axs[0, 1].plot(
         input_frequency_x_frames[frame], input_frequency_y_frames[frame]
     )
-    axs[0, 1].set_ylim(-12, 2)
+    axs[0, 1].set_ylim(-100, 2)
+    axs[0, 1].set_xlim(0, 20000)
 
     # Axis (1, 1): output frequency plot
     axs[1, 1].clear()
     axs[1, 1].plot(
         output_frequency_x_frames[frame], output_frequency_y_frames[frame]
     )
-    axs[1, 1].set_ylim(-12, 2)
+    axs[1, 1].set_ylim(-100, 2)
+    axs[1, 1].set_xlim(0, 20000)
 
     return mplfig_to_npimage(fig)
 
